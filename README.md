@@ -41,6 +41,6 @@ make
 ./termwatch
 ```
 
-Tekan `q` atau `Ctrl+C` untuk keluar. Terminal dipulihkan otomatis.
+Press `q` or `Ctrl+C` to exit. The terminal is automatically restored.
 
-Tampilan memakai warna truecolor, layar alternatif, dan satu tulis per frame sehingga pembaruan tidak berkedip. Gunakan terminal dengan dukungan UTF-8 dan truecolor (hampir semua terminal modern).
+The display uses truecolor, an alternate screen, and performs a single write per frame to prevent flickering. Use a terminal that supports UTF-8 and truecolor (almost all modern terminals).
