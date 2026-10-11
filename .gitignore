@@ -1,0 +1,3 @@
+*.o
+sysinfo_tool
+.vscode/
