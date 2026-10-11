@@ -12,6 +12,12 @@
 
 ---
 
+<p align="center">
+  <img src="usage.png" alt="TermWatch screenshot" width="720">
+</p>
+
+---
+
 ## 🔍 Overview
 
 **TermWatch** is a native terminal system monitor designed to provide real-time Linux system statistics and an interactive view of running processes in one place.
