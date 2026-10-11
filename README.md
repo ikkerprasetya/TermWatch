@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  A lightweight, real-time system monitor and process viewer written in <b>pure C</b>. Monitor system resources, browse running processes, and inspect process information through an interactive, keyboard-driven terminal interface.
+  A lightweight, real-time system monitor and process viewer written in <b>pure C</b>. Monitor system resources, browse running processes, and inspect process information through an interactive, keyboard-driven claude code-like terminal interface.
 </p>
 
 ---
