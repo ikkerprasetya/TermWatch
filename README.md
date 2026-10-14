@@ -14,7 +14,7 @@
 ---
 
 <p align="center">
-  <img src="usage.png" alt="TermWatch screenshot" width="720">
+  <img src="usage.png" alt="another TermWatch screenshot" width="720">
 </p>
 
 ---
