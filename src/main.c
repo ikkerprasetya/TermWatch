@@ -1,13 +1,15 @@
-<<<<<<< HEAD
+#include <stdio.h>
+#include <string.h>
 #include <time.h>
-#include "system_info.h"
-#include "cpu_info.h"
-#include "mem_info.h"
+#include <unistd.h>
+#include "app.h"
 #include "term.h"
 #include "ui.h"
 
-#define SAMPLE_INTERVAL_MS 1000
 #define FIRST_SAMPLE_MS 300
+
+static AppData data;
+static UiState ui;
 
 static long long now_ms(void) {
     struct timespec ts;
@@ -15,91 +17,60 @@ static long long now_ms(void) {
     return (long long)ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
 }
 
-int main(void) {
-    SystemInfo sys;
-    CpuInfo cpu;
-    MemoryInfo mem;
+static void sample(AppData *d, double dt) {
+    fetch_system_info(&d->sys);
+    fetch_mem_info(&d->mem);
+    cpu_update(&d->cpu);
+    history_push(&d->cpu_hist, d->cpu.usage_percent);
+    d->disk_count = fetch_disks(d->disks, MAX_DISKS, dt);
+    net_update(&d->net, dt);
+    proc_update(&d->procs, d->cpu.delta_total);
+}
 
-    fetch_cpu_static_info(&cpu);
-    cpu.usage_percent = 0.0;
-    calculate_cpu_usage();
-    fetch_system_info(&sys);
-    fetch_mem_info(&mem);
+int main(void) {
+    if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO)) {
+        fprintf(stderr, "termwatch: an interactive terminal is required\n");
+        return 1;
+    }
+
+    memset(&data, 0, sizeof(data));
+    fetch_cpu_static_info(&data.cpu);
+    ui_init(&ui);
+
+    long long last = now_ms();
+    sample(&data, 1.0);
+    ui_pick_interface(&ui, &data);
 
     term_enter();
 
     long long next_sample = now_ms() + FIRST_SAMPLE_MS;
+    int running = 1;
 
-    while (!term_quit_requested()) {
+    while (running && !term_quit_requested()) {
         int cols, rows;
         term_size(&cols, &rows);
-        ui_render(&sys, &cpu, &mem, cols, term_take_resize());
+        ui_render(&ui, &data, cols, rows, term_take_resize(), now_ms());
 
-        int key = term_wait((int)(next_sample - now_ms()));
-        if (key == 'q' || key == 'Q') break;
+        long long wait = next_sample - now_ms();
+        term_wait(wait > 0 ? (int)wait : 0);
 
-        if (now_ms() >= next_sample) {
-            fetch_system_info(&sys);
-            fetch_mem_info(&mem);
-            cpu.usage_percent = calculate_cpu_usage();
-            ui_push_cpu_sample(cpu.usage_percent);
-            next_sample = now_ms() + SAMPLE_INTERVAL_MS;
+        TermKey key;
+        while (term_next_key(&key)) {
+            int result = ui_key(&ui, &data, &key, now_ms());
+            if (result & UI_QUIT) {
+                running = 0;
+                break;
+            }
+            if (result & UI_RESAMPLE) next_sample = now_ms();
+        }
+
+        long long now = now_ms();
+        if (running && now >= next_sample) {
+            sample(&data, (double)(now - last) / 1000.0);
+            last = now;
+            next_sample = now + ui.interval_ms;
         }
     }
 
     return 0;
 }
-=======
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
-#include "system_info.h"
-#include "cpu_info.h"
-#include "mem_info.h"
-
-static volatile int keep_running = 1;
-
-void handle_sigint(int sig) {
-    (void)sig;
-    keep_running = 0;
-}
-
-int main(void) {
-    signal(SIGINT, handle_sigint);
-
-    SystemInfo sys;
-    CpuInfo cpu;
-    MemoryInfo mem;
-
-    fetch_cpu_static_info(&cpu);
-    calculate_cpu_usage();
-
-    // Hide terminal cursor
-    printf("\033[?25l");
-
-    while (keep_running) {
-        fetch_system_info(&sys);
-        cpu.usage_percent = calculate_cpu_usage();
-        fetch_mem_info(&mem);
-
-        // Native Linux terminal clear
-        if (system("clear") != 0) {
-            printf("\033[H\033[J");
-        }
-
-        print_system_info(&sys);
-        print_cpu_info(&cpu);
-        print_mem_info(&mem);
-
-        printf("\033[90mPress Ctrl+C to exit. Refresh rate: 1s\033[0m\n");
-        fflush(stdout);
-
-        sleep(1);
-    }
-
-    // Restore cursor visibility
-    printf("\033[?25h\nExiting cleanly...\n");
-    return 0;
-}
->>>>>>> 6ec40683499a86f91f1e5cd6917dca80c8d1fee0
