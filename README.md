@@ -9,12 +9,13 @@
 
 <p align="center">
   A lightweight, real-time system monitor and process viewer written in <b>pure C</b>. Monitor system resources, browse running processes, and inspect process information through an interactive, keyboard-driven terminal interface. No third-party libraries, reading live telemetry straight from <code>/proc</code> and POSIX system calls.
+  (It's somehow looks like htop? but my friends suggest to keep it since they all scrapping from other codes and tried to make it lightweight enough)
 </p>
 
 ---
 
 <p align="center">
-  <img src="usage.png" alt="another TermWatch screenshot" width="720">
+  <img src="screenshot.png" alt="another TermWatch screenshot" width="720">
 </p>
 
 ---
@@ -240,3 +241,4 @@ Contributions, issues, and feature requests are welcome!
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+    
